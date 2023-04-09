@@ -11,8 +11,8 @@ import useApiErrorsHandler from '../../hooks/useApiErrorHandler';
 
 const LoginScreen = ({navigation}) => {
   const dispatch = useDispatch();
-  const [email, setEmail] = useState('dasdasd@gmail.com');
-  const [password, setPassword] = useState('dsfafsdfsd');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [loader, setLoader] = useState(false);
