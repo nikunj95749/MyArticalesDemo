@@ -1,31 +1,23 @@
 import AsyncStorage from '@react-native-community/async-storage';
-import { logError } from './logging';
+import {logError} from './logging';
 
-const TOKEN_KEY = '@auth_token';
+const USER_DETAILS_KEY = '@user_token';
 
-export const setAuthToken = async (value = '') => {
+export const setUserDetails = async (value = '') => {
   try {
-    await AsyncStorage.setItem(TOKEN_KEY, value);
+    await AsyncStorage.setItem(USER_DETAILS_KEY, value);
   } catch (err) {
     logError(err, '[setAuthToken] AsyncStorage Error');
   }
 };
 
-export const getAuthToken = async () => {
+export const getUserDetails = async () => {
   try {
-    return await AsyncStorage.getItem(TOKEN_KEY);
+    return await AsyncStorage.getItem(USER_DETAILS_KEY);
   } catch (err) {
     logError(err, '[getAuthToken] AsyncStorage Error');
 
     return null;
-  }
-};
-
-export const removeAuthToken = async () => {
-  try {
-    await AsyncStorage.removeItem(TOKEN_KEY);
-  } catch (err) {
-    logError(err, '[removeAuthToken] AsyncStorage Error');
   }
 };
 
@@ -39,7 +31,9 @@ export const clearAsyncStorage = async () => {
 };
 
 export const authHeader = async () => {
-  const token = await getAuthToken();
+  const userDetails = await getUserDetails();
 
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return userDetails
+    ? {Authorization: `Bearer ${JSON.parse(userDetails)?.token}`}
+    : {};
 };

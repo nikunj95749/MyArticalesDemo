@@ -3,14 +3,12 @@ import thunk from 'redux-thunk';
 import {composeWithDevTools} from 'redux-devtools-extension';
 
 import {createReducerManager} from './reducerManager';
-import auth from './auth';
 import article from './article';
-import profileData from './profileData';
+import userDetails from './userDetails';
 
 const initialReducers = {
-  auth,
   article,
-  profileData,
+  userDetails,
 };
 
 export default function configureStore(preloadedState) {

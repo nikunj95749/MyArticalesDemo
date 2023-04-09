@@ -4,34 +4,50 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Images} from '../assets/images';
-import {timeAgo} from '../helpers';
-import {getComment, postComment} from '../resources/baseServices/article';
-import SmallLoader from './Loader/SmallLoader';
+import {logError, timeAgo} from '../helpers';
+import {postComment} from '../resources/baseServices/article';
+import {useSelector} from 'react-redux';
+import {LIGHT_GRAY_105} from '../styles';
+import {EnterCommentPostField} from './EnterCommentPostField';
+import useApiErrorsHandler from '../hooks/useApiErrorHandler';
 
 export const PostItem = ({post, navigation}) => {
-  const [comment, setComment] = useState('');
+  const user = useSelector(state => state.userDetails.user_data ?? '');  
   const [loader, setLoader] = useState(false);
 
-  const handleAddComment = async () => {
-    setLoader(true);
-    const commentData = {comment: {body: comment}};
-    const res = await postComment(commentData, `/${post?.slug}/comments`);
-    if (res.data) {
-      setComment('');
+  const handleApiErrors = useApiErrorsHandler();
+
+  const handlePostComment = async (data = '') => {
+    try {
+      setLoader(true);
+      const commentData = {comment: {body: data}};
+      await postComment(commentData, post?.slug);
+    } catch (error) {
+      handleApiErrors(error);
+      logError(error, 'handlePostComment');
+    } finally {
       setLoader(false);
     }
   };
+
+  const handleComment = () => {
+    if (user?.username) {
+      navigation.navigate('Comments', {slug: post?.slug});
+    } else {
+      navigation.navigate('Login');
+    }
+  }
+
   return (
     <View key={post.id} style={styles.postView}>
       <View style={styles.flexDirectionRow}>
-        <FastImage
+        {post?.author?.image &&<FastImage
           style={styles.authorImage}
           source={{uri: post?.author?.image}}
-        />
+        />}
         <View>
           <View>
             <Text style={styles.authorName}>{post?.author?.username}</Text>
@@ -48,17 +64,17 @@ export const PostItem = ({post, navigation}) => {
           </Text>
         ))}
       </View>
-      <View style={{paddingLeft: 4}}>
+      <View style={styles.contentView}>
         <Text style={styles.postTitle}>{post?.title}</Text>
         <Text style={styles.postDescription}>{post?.description}</Text>
       </View>
       <View style={styles.postActionView}>
-        <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}}>
+        <TouchableOpacity style={styles.favoriteContainer}>
           <FastImage
             style={styles.postActionImage}
             source={post?.favorited ? Images.fillHeart : Images.heart}
             resizeMode="contain"
-            tintColor={'#c2c2c2'}
+            tintColor={LIGHT_GRAY_105}
           />
           {post?.favoritesCount != 0 && (
             <Text style={styles.favoritesCountText}>
@@ -67,50 +83,23 @@ export const PostItem = ({post, navigation}) => {
           )}
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => navigation.navigate('Comments', {slug: post?.slug})}
+          onPress={handleComment}
           style={{flexDirection: 'row', alignItems: 'center', marginLeft: 15}}>
           <FastImage
             style={styles.postActionImage}
             source={Images.comment}
             resizeMode="contain"
-            tintColor={'#c2c2c2'}
+            tintColor={LIGHT_GRAY_105}
           />
-          {post?.commentCount != 0 && (
-            <Text style={styles.favoritesCountText}>{post?.commentCount}</Text>
-          )}
         </TouchableOpacity>
       </View>
-      <View style={styles.commentView}>
-        <FastImage
-          style={styles.loginUserName}
-          source={{
-            uri: 'https://torum-bucket.s3.us-east-2.amazonaws.com/600698915a08de0dc542f27c/image/gZSnkxe0J5.jpeg',
-          }}
-        />
-        <TextInput
-          placeholder="Comment on this..."
-          placeholderTextColor={'#c2c2c2'}
-          style={styles.commentInput}
-          onChangeText={setComment}
-          value={comment}
-        />
-        <TouchableOpacity
-          style={styles.postButton}
-          onPress={handleAddComment}
-          disabled={comment.length == 0 ? true : false}>
-          {loader ? (
-            <SmallLoader style={{marginRight: 10}} />
-          ) : (
-            <Text
-              style={[
-                styles.postText,
-                {opacity: comment.length == 0 ? 0.5 : 1},
-              ]}>
-              Post
-            </Text>
-          )}
-        </TouchableOpacity>
-      </View>
+      <EnterCommentPostField
+        onPost={data => {
+          handlePostComment(data);
+        }}
+        isDisable={!user?.username}
+        isLoading={loader}
+      />
     </View>
   );
 };
@@ -122,6 +111,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0c0f13',
     borderRadius: 15,
   },
+  contentView:{paddingLeft: 4},
   hearView: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -135,31 +125,32 @@ const styles = StyleSheet.create({
   authorName: {
     marginLeft: 10,
     fontWeight: '600',
-    color: '#c2c2c2',
+    color: LIGHT_GRAY_105,
     fontSize: 16,
   },
   authorFollowerText: {
     marginLeft: 10,
     fontWeight: '400',
-    color: '#c2c2c2',
+    color: LIGHT_GRAY_105,
     fontSize: 14,
   },
   postTitle: {
     marginTop: 15,
     fontWeight: '600',
     fontSize: 14,
-    color: '#c2c2c2',
+    color: LIGHT_GRAY_105,
   },
   postDescription: {
     marginTop: 10,
     fontWeight: '400',
     fontSize: 14,
-    color: '#c2c2c2',
+    color: LIGHT_GRAY_105,
   },
   tagContainer: {
     flexDirection: 'row',
     marginTop: 10,
   },
+  favoriteContainer:{flexDirection: 'row', alignItems: 'center'},
   tag: {
     overflow: 'hidden',
     backgroundColor: 'rgba(54, 119, 239, 0.1)',
@@ -182,7 +173,7 @@ const styles = StyleSheet.create({
   favoritesCountText: {
     marginLeft: 5,
     fontWeight: '400',
-    color: '#c2c2c2',
+    color: LIGHT_GRAY_105,
     fontSize: 14,
   },
   commentView: {
@@ -205,8 +196,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderWidth: 1,
     marginHorizontal: 10,
-    borderColor: '#c2c2c2',
-    color: '#c2c2c2',
+    borderColor: LIGHT_GRAY_105,
+    color: LIGHT_GRAY_105,
   },
   postButton: {
     position: 'absolute',

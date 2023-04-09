@@ -16,7 +16,7 @@ export default (state = initialState, action) =>
     }
   });
 
-export const getUserData = (data = []) => ({
+export const setUserDetailsAction = (data = []) => ({
   type: GET_USER_DATA,
   payload: data,
 });

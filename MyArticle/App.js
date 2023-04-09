@@ -1,15 +1,12 @@
 import React from 'react';
 import {Provider} from 'react-redux';
 import {StatusBar, StyleSheet, View} from 'react-native';
-import {enableScreens} from 'react-native-screens';
 import configureStore from './src/store/configureStore';
 import Navigation from './src/navigation';
 import {WHITE} from './src/styles';
+import FlashMessage from 'react-native-flash-message';
 
 const store = configureStore();
-
-
-enableScreens();
 
 export default function App() {
   return (
@@ -17,6 +14,7 @@ export default function App() {
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
         <Navigation />
+        <FlashMessage position="top" />
       </View>
     </Provider>
   );

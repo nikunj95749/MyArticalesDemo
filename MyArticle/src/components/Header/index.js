@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Images} from '../../assets/images';
+import { LIGHT_GRAY_105 } from '../../styles';
 
 export const Header = ({navigation, title, backIcon}) => {
   return (
@@ -15,7 +16,7 @@ export const Header = ({navigation, title, backIcon}) => {
           <FastImage
             style={styles.backArrowIcon}
             source={Images.backArrow}
-            tintColor={'#c2c2c2'}
+            tintColor={LIGHT_GRAY_105}
           />
         </TouchableOpacity>
       )}
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
   },
   authorName: {
     fontWeight: '600',
-    color: '#c2c2c2',
+    color: LIGHT_GRAY_105,
     fontSize: 16,
   },
 });

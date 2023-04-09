@@ -1,26 +1,20 @@
-import { useCallback, useEffect } from 'react';
-import { addEventListener } from '@react-native-community/netinfo';
-import { useDispatch } from 'react-redux';
-import { notify } from '../store/notifications';
+import {useCallback, useEffect} from 'react';
+import {addEventListener} from '@react-native-community/netinfo';
 import debounce from 'lodash/debounce';
+import {showMessage} from 'react-native-flash-message';
 
 const NETWORK_CONNECTION_CHECK_DELAY = 3000;
 
 const useConnectionInfo = () => {
-  const dispatch = useDispatch();
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const _handleConnectionStatus = useCallback(
     debounce(
       (isConnectionStable = true) => {
         if (!isConnectionStable) {
-          dispatch(
-            notify({
-              title: 'Bad connection',
-              message: 'Please check your internet connection',
-              type: 'warning',
-            }),
-          );
+          showMessage({
+            message: 'Bad connection',
+            description: 'Please check your internet connection',
+            type: 'danger',
+          });
         }
       },
       NETWORK_CONNECTION_CHECK_DELAY,
@@ -34,7 +28,7 @@ const useConnectionInfo = () => {
 
   useEffect(() => {
     const unsubscribe = addEventListener(networkState => {
-      const { isConnected, isInternetReachable } = networkState;
+      const {isConnected, isInternetReachable} = networkState;
 
       _handleConnectionStatus(isConnected && isInternetReachable);
     });

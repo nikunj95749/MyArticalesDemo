@@ -1,26 +1,22 @@
 import React, {useState} from 'react';
-import {
-  View,
-  TextInput,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
+import {View, TextInput, StyleSheet, Text} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useDispatch} from 'react-redux';
 import {logIn} from '../../resources/baseServices/auth';
-import {setAuthToken} from '../../helpers/auth';
-import {setAuthTokenAction} from '../../store/auth';
-import SmallLoader from '../../components/Loader/SmallLoader';
-import { getUserData } from '../../store/profileData';
+import {setUserDetails} from '../../helpers/auth';
+import {setUserDetailsAction} from '../../store/userDetails';
+import {logError} from '../../helpers';
+import CustomButton from '../../components/CustomButton';
+import useApiErrorsHandler from '../../hooks/useApiErrorHandler';
 
 const LoginScreen = ({navigation}) => {
   const dispatch = useDispatch();
-  const [email, setEmail] = useState("dasdasd@gmail.com");
+  const [email, setEmail] = useState('dasdasd@gmail.com');
   const [password, setPassword] = useState('dsfafsdfsd');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [loader, setLoader] = useState(false);
+  const handleApiErrors = useApiErrorsHandler();
 
   const validateEmail = email => {
     const re = /\S+@\S+\.\S+/;
@@ -28,41 +24,37 @@ const LoginScreen = ({navigation}) => {
   };
 
   const handleLogin = async () => {
-    setLoader(true);
-    if (!validateEmail(email)) {
-      setEmailError('Please enter a valid email address');
-      setLoader(false);
-    } else {
-      setEmailError('');
-      setLoader(false);
-    }
-
-    if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
-      setLoader(false);
-    } else {
-      setPasswordError('');
-      setLoader(false);
-    }
-
-    if (validateEmail(email) && password.length >= 6) {
-      const loginData = {
-        user: {
-          email,
-          password,
-        },
-      };
-      try {
-        const response = await logIn(loginData);
-        await setAuthToken(response?.data?.user?.token);
-        dispatch(setAuthTokenAction(response?.data?.user?.token));
-        dispatch(getUserData(response?.data?.user));
-        navigation.navigate('HomeFeedScreen');
-        setLoader(false);
-      } catch (error) {
-        setLoader(false);
-        console.log(error);
+    try {
+      setLoader(true);
+      if (!validateEmail(email)) {
+        setEmailError('Please enter a valid email address');
+        return;
       }
+      if (password.length < 6) {
+        setPasswordError('Password must be at least 6 characters');
+        return;
+      }
+
+      setEmailError('');
+
+      if (validateEmail(email) && password.length >= 6) {
+        const loginData = {
+          user: {
+            email,
+            password,
+          },
+        };
+
+        const response = await logIn(loginData);
+        await setUserDetails(JSON.stringify(response?.data?.user));
+        dispatch(setUserDetailsAction(response?.data?.user));
+        navigation.goBack();
+      }
+    } catch (error) {
+      handleApiErrors(error);
+      logError(error);
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -70,7 +62,7 @@ const LoginScreen = ({navigation}) => {
     <View style={styles.container}>
       <Text style={styles.loginText}>Log in</Text>
       <View style={styles.subContainer}>
-        <KeyboardAwareScrollView bounces={false} style={{flex: 1}}>
+        <KeyboardAwareScrollView bounces={false} style={styles.flex}>
           <View style={styles.loginView}>
             <TextInput
               style={styles.input}
@@ -91,15 +83,11 @@ const LoginScreen = ({navigation}) => {
             {passwordError ? (
               <Text style={styles.error}>{passwordError}</Text>
             ) : null}
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-              {loader ? (
-                <SmallLoader />
-              ) : (
-                <Text style={{color: 'white', fontWeight: '600', fontSize: 18}}>
-                  Login
-                </Text>
-              )}
-            </TouchableOpacity>
+            <CustomButton
+              title="Login"
+              isLoading={loader}
+              onPress={handleLogin}
+            />
           </View>
         </KeyboardAwareScrollView>
       </View>
@@ -112,6 +100,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0c0f13',
     justifyContent: 'flex-end',
+  },
+  flex: {
+    flex: 1,
   },
   loginText: {
     fontWeight: '600',
@@ -140,16 +131,6 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
     marginBottom: 10,
-  },
-  loginButton: {
-    marginTop: 30,
-    width: '100%',
-    height: 45,
-    backgroundColor: '#0c0f13',
-    alignSelf: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 30,
   },
 });
 

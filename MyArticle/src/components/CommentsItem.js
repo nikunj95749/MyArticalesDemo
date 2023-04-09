@@ -1,22 +1,27 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Images} from '../assets/images';
 import {timeAgo} from '../helpers';
 import {useSelector} from 'react-redux';
+import {LIGHT_GRAY_105} from '../styles';
 
-export const CommentsItem = ({comment, index, handleDeleteComment}) => {
-  const user = useSelector(state => state.profileData.user_data ?? '');
+export const CommentsItem = ({
+  comment,
+  index,
+  handleDeleteComment = () => {},
+}) => {
+  const user = useSelector(state => state.userDetails.user_data ?? '');
   return (
-    <View key={comment.id + index} style={styles.postView}>
-      <View style={styles.flexDirectionRow}>
-        <View style={{flexDirection: 'row'}}>
+    <View key={comment.id + index} style={styles.container}>
+      <View style={styles.mainContainer}>
+        <View style={styles.imageContainer}>
           <FastImage
             style={styles.authorImage}
             source={{uri: comment?.author?.image}}
           />
-          <View style={{marginLeft: 10}}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <View style={styles.contentContainer}>
+            <View style={styles.contentSubView}>
               <Text style={styles.authorName}>{comment?.author?.username}</Text>
               <Text style={styles.createdAtText}>
                 {timeAgo(comment?.createdAt)}
@@ -33,7 +38,7 @@ export const CommentsItem = ({comment, index, handleDeleteComment}) => {
               style={styles.deleteImage}
               source={Images.delete}
               resizeMode="contain"
-              tintColor={'#c2c2c2'}
+              tintColor={LIGHT_GRAY_105}
             />
           </TouchableOpacity>
         )}
@@ -44,11 +49,12 @@ export const CommentsItem = ({comment, index, handleDeleteComment}) => {
 };
 
 const styles = StyleSheet.create({
-  postView: {
+  container: {
     paddingTop: 15,
     paddingHorizontal: 10,
     borderRadius: 15,
   },
+  imageContainer: {flexDirection: 'row'},
   authorImage: {
     height: 28,
     width: 28,
@@ -56,26 +62,26 @@ const styles = StyleSheet.create({
   },
   authorName: {
     fontWeight: '600',
-    color: '#c2c2c2',
+    color: LIGHT_GRAY_105,
     fontSize: 12,
   },
   commentText: {
     marginTop: 4,
     fontWeight: '600',
-    color: '#c2c2c2',
+    color: LIGHT_GRAY_105,
     fontSize: 14,
   },
   createdAtText: {
     marginLeft: 8,
     fontWeight: '400',
-    color: '#c2c2c2',
+    color: LIGHT_GRAY_105,
     fontSize: 12,
   },
   horizontalDivider: {
     marginTop: 10,
     width: '100%',
     height: 1,
-    borderColor: '#c2c2c2',
+    borderColor: LIGHT_GRAY_105,
     borderTopWidth: 0.5,
     alignSelf: 'center',
   },
@@ -88,9 +94,11 @@ const styles = StyleSheet.create({
     height: 20,
     width: 20,
   },
-  flexDirectionRow: {
+  mainContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  contentContainer: {marginLeft: 10},
+  contentSubView: {flexDirection: 'row', alignItems: 'center'},
 });
