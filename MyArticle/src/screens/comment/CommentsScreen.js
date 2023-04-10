@@ -116,8 +116,8 @@ const styles = StyleSheet.create({
     backgroundColor: BLACK,
   },
   flex: {flex: 1},
-  avoidingView: {position: 'absolute', left: 0, right: 0, bottom: 30},
-  commentFieldContainer: {paddingVertical: 20, backgroundColor: BLACK},
+  avoidingView: {position: 'absolute', left: 0, right: 0, bottom: 0},
+  commentFieldContainer: {paddingVertical: 20,paddingHorizontal:10, backgroundColor: BLACK},
 });
 
 export default CommentsScreen;
