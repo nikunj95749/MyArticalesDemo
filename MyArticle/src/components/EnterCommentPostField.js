@@ -38,11 +38,12 @@ export const EnterCommentPostField = ({
           }}
         />
       )}
-      <View style={styles.commentInput}>
+      <View style={styles.commentInputView}>
         <TextInput
           placeholder="Comment on this..."
           placeholderTextColor={LIGHT_GRAY_105}
           editable={!isDisable}
+          style={styles.commentInput}
           onChangeText={setComment}
           value={comment}
         />
@@ -76,6 +77,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 15,
   },
+  commentInput: {color: LIGHT_GRAY_105},
   disabledView: {
     position: 'absolute',
     height: '100%',
@@ -156,7 +158,7 @@ const styles = StyleSheet.create({
     width: 35,
     borderRadius: 35 / 2,
   },
-  commentInput: {
+  commentInputView: {
     height: 40,
     flex: 1,
     paddingLeft: 10,
@@ -167,7 +169,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginHorizontal: 10,
     borderColor: LIGHT_GRAY_105,
-    color: LIGHT_GRAY_105,
   },
   postText: {
     fontWeight: '600',
