@@ -16,6 +16,7 @@ export const EnterCommentPostField = ({
   isLoading = false,
   style = {},
   isDisable = false,
+  handleOnComment = () => {},
 }) => {
   const [comment, setComment] = useState('');
   const user = useSelector(state => state.userDetails.user_data ?? '');
@@ -38,16 +39,15 @@ export const EnterCommentPostField = ({
         />
       )}
       <View style={styles.commentInput}>
-      <TextInput
-        placeholder="Comment on this..."
-        placeholderTextColor={LIGHT_GRAY_105}
-        
-        editable={!isDisable}
-        onChangeText={setComment}
-        value={comment}
-      />
+        <TextInput
+          placeholder="Comment on this..."
+          placeholderTextColor={LIGHT_GRAY_105}
+          editable={!isDisable}
+          onChangeText={setComment}
+          value={comment}
+        />
       </View>
-     
+
       <TouchableOpacity
         onPress={handlePost}
         disabled={comment.length == 0 ? true : false}>
@@ -60,6 +60,12 @@ export const EnterCommentPostField = ({
           </Text>
         )}
       </TouchableOpacity>
+
+      {isDisable && (
+        <TouchableOpacity
+          onPress={handleOnComment}
+          style={styles.disabledView}></TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -68,8 +74,12 @@ const styles = StyleSheet.create({
   postView: {
     marginTop: 10,
     padding: 10,
-
     borderRadius: 15,
+  },
+  disabledView: {
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
   },
   smallLoaderContainer: {marginRight: 10},
   hearView: {
@@ -115,7 +125,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(54, 119, 239, 0.1)',
     borderRadius: 10,
     fontSize: 12,
-    color:BLUE,
+    color: BLUE,
     paddingVertical: 2,
     paddingHorizontal: 6,
     marginRight: 4,
@@ -140,7 +150,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 20,
-    
   },
   loginUserName: {
     height: 35,
@@ -149,12 +158,12 @@ const styles = StyleSheet.create({
   },
   commentInput: {
     height: 40,
-    flex:1,
+    flex: 1,
     paddingLeft: 10,
     paddingRight: 50,
     borderRadius: 20,
     alignSelf: 'center',
-    justifyContent:'center',
+    justifyContent: 'center',
     borderWidth: 1,
     marginHorizontal: 10,
     borderColor: LIGHT_GRAY_105,

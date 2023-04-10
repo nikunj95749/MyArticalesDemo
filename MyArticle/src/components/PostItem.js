@@ -41,6 +41,12 @@ export const PostItem = ({post, navigation}) => {
     }
   }
 
+  const handleAddComment = () => {
+    if (!user?.username) {
+      navigation.navigate('Login');
+    }
+  }
+
   return (
     <View key={post.id} style={styles.postView}>
       <View style={styles.flexDirectionRow}>
@@ -97,6 +103,7 @@ export const PostItem = ({post, navigation}) => {
         onPost={data => {
           handlePostComment(data);
         }}
+        handleOnComment={handleAddComment}
         isDisable={!user?.username}
         isLoading={loader}
       />
